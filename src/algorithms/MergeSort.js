@@ -1,58 +1,44 @@
 const MergeSort = (array, position, arraySteps, colorSteps) => {
-  const merge = (left, right, startIdx, colorKey) => {
-    let sorted = [], i = 0, j = 0;
-    let resultColorKey = colorKey.slice(); // Copy the color key
+  const colorKey = new Array(array.length).fill(0);
+  const recordStep = () => {
+    arraySteps.push(array.slice());
+    colorSteps.push(colorKey.slice());
+  };
 
-    while (i < left.length && j < right.length) {
-      // Compare and push the smaller element into the sorted array
-      if (left[i] < right[j]) {
-        sorted.push(left[i]);
-        resultColorKey[startIdx + sorted.length - 1] = 1; // Color the merging element
-        arraySteps.push(array.slice(0, startIdx).concat(sorted, left.slice(i + 1), right.slice(j)));
-        colorSteps.push(resultColorKey.slice());
-        i++;
-      } else {
-        sorted.push(right[j]);
-        resultColorKey[startIdx + sorted.length - 1] = 1; // Color the merging element
-        arraySteps.push(array.slice(0, startIdx).concat(sorted, left.slice(i), right.slice(j + 1)));
-        colorSteps.push(resultColorKey.slice());
-        j++;
-      }
+  recordStep();
+
+  const mergeSort = (start, end) => {
+    if (end - start <= 1) {
+      return;
     }
 
-    // Concat remaining elements and push them into sorted
-    sorted = sorted.concat(left.slice(i)).concat(right.slice(j));
-    arraySteps.push(array.slice(0, startIdx).concat(sorted));
-    resultColorKey.fill(2, startIdx, startIdx + sorted.length); // Mark as sorted
-    colorSteps.push(resultColorKey.slice());
+    const middle = Math.floor((start + end) / 2);
+    mergeSort(start, middle);
+    mergeSort(middle, end);
 
-    return sorted;
+    const merged = [];
+    let left = start;
+    let right = middle;
+
+    while (left < middle && right < end) {
+      merged.push(array[left] <= array[right] ? array[left++] : array[right++]);
+    }
+    while (left < middle) merged.push(array[left++]);
+    while (right < end) merged.push(array[right++]);
+
+    for (let index = 0; index < merged.length; index++) {
+      array[start + index] = merged[index];
+      colorKey[start + index] = 1;
+      recordStep();
+    }
+
+    colorKey.fill(2, start, end);
+    recordStep();
   };
 
-  const mergeSortRecursive = (arr, startIdx, colorKey) => {
-    if (arr.length <= 1) return arr;
-
-    let mid = Math.floor(arr.length / 2);
-    
-    // Recursively split and merge
-    let left = mergeSortRecursive(arr.slice(0, mid), startIdx, colorKey);
-    let right = mergeSortRecursive(arr.slice(mid), startIdx + mid, colorKey);
-
-    // Merge the two halves and return the merged array
-    return merge(left, right, startIdx, colorKey);
-  };
-
-  // Initialize colorKey and start the recursive merge sort
-  let colorKey = new Array(array.length).fill(0); // 0 = unsorted, 1 = processing, 2 = sorted
-  arraySteps.push(array.slice());
-  colorSteps.push(colorKey.slice());
-
-  // Call the recursive merge sort
-  array = mergeSortRecursive(array, 0, colorKey);
-
-  // Mark the final sorted state
-  colorSteps.push(new Array(array.length).fill(2)); // Mark everything as sorted
-  arraySteps.push(array.slice());
+  mergeSort(0, array.length);
+  colorKey.fill(2);
+  recordStep();
 };
 
 export default MergeSort;
