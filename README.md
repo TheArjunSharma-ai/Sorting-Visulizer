@@ -65,8 +65,9 @@ The app is configured for GitHub Pages at
 [https://thearjunsharma-ai.github.io/Sorting-Visulizer](https://thearjunsharma-ai.github.io/Sorting-Visulizer).
 Pushes to `main` run the GitHub Actions workflow in
 `.github/workflows/deploy.yml`, which builds the app and deploys it to GitHub
-Pages. The repository's Pages source must be set to **GitHub Actions** in
-**Settings → Pages**.
+Pages. The workflow is configured to enable GitHub Pages for the repository
+and set the source to **GitHub Actions** when it has the required repository
+permissions.
 
 ## Contributing and reporting issues
 
