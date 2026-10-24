@@ -1,0 +1,51 @@
+.algorithm-settings {
+  flex: 0 0 280px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.algorithm-settings form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.algorithm-settings input,
+.algorithm-settings select,
+.algorithm-settings textarea,
+.algorithm-settings button {
+  padding: 8px;
+  font: inherit;
+}
+
+.algorithm-settings fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.algorithm-settings textarea {
+  resize: vertical;
+}
+
+.settings-error {
+  color: #a01919;
+}
+
+.algorithm-settings dialog {
+  max-width: 480px;
+  border: 1px solid #888;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.algorithm-settings dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 700px) {
+  .app {
+    flex-direction: column;
+  }
+}

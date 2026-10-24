@@ -1,14 +1,7 @@
-import { useEffect, useState } from "react";
 import "./Bar.css"; // Ensure this file has the appropriate styles
-import { useSortingValue } from "../sortingContext";
 
 function Bar({ index, length, color }) {
-  const [len, setLen] = useState(length);
-  const {minNumber,maxNumber,changeArray} = useSortingValue();
-
-  useEffect(() => {
-    setLen(length); // Update length when prop changes
-  }, [length]);
+  const len = length;
 
   const inputStyle = {
     position: "relative",
@@ -35,16 +28,6 @@ function Bar({ index, length, color }) {
     transition: "1s",
     background: `radial-gradient(circle, #fff 0%, ${colors[color][0]} 100%)`,
   };
-  const changeValue = (val) => {
-    if (val === "") {
-      setLen(0);
-      changeArray(index, 0);
-    } else {
-      val = Math.max(minNumber, Math.min(maxNumber, parseInt(val))); // Clamp value between 0 and max
-      setLen(val);
-      changeArray(index, val);
-    }
-  }
   return (
     <div className="bar" style={barStyle}>
       <input
@@ -52,7 +35,8 @@ function Bar({ index, length, color }) {
         style={inputStyle}
         className="input"
         value={len}
-        onChange={(e) => changeValue(e.target.value)}
+        readOnly
+        aria-label={`Value ${index + 1}`}
       />
     </div>
   );

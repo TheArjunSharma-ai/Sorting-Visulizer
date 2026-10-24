@@ -16,7 +16,7 @@ const SortingVisualizer = () => {
   const [colorKey, setColorKey] = useState([]);
   const timeouts = useRef([]);
 
-  const { array, setArray, algorithm, delay, arraySize, minNumber, maxNumber } =
+  const { array, setArray, algorithm, delay, runId, minNumber, maxNumber } =
     useSortingValue();
 
   // Clear all timeouts
@@ -28,26 +28,9 @@ const SortingVisualizer = () => {
   // Generate a new random array
   const handleRandomArray = useCallback(() => {
     clearTimeouts();
-    const newArray = generateRandomArray(arraySize, minNumber, maxNumber);
-    const blankKey = new Array(arraySize).fill(0);
-    const steps = [];
-    const nextColorSteps = [];
-    NameOfSortingAlgorithm[algorithm](
-      newArray.slice(),
-      0,
-      steps,
-      nextColorSteps
-    );
-
-    setArray(newArray);
-    setCurrentArray(newArray);
-    setColorKey(blankKey);
-    setArraySteps(steps);
-    setColorSteps(nextColorSteps);
-    setCurrentStep(0);
+    setArray(generateRandomArray(array.length, minNumber, maxNumber));
   }, [
-    algorithm,
-    arraySize,
+    array.length,
     clearTimeouts,
     maxNumber,
     minNumber,
@@ -83,34 +66,44 @@ const SortingVisualizer = () => {
 
   // Show previous sorting step
   const previousStep = () => {
+    clearTimeouts();
     if (currentStep === 0) return;
-    setCurrentStep(currentStep - 1);
-    setCurrentArray(arraySteps[currentStep - 1]);
-    setColorKey(colorSteps[currentStep - 1]);
+    const nextIndex = currentStep - 1;
+    setCurrentStep(nextIndex);
+    setCurrentArray(nextIndex === 0 ? array : arraySteps[nextIndex - 1]);
+    setColorKey(nextIndex === 0
+      ? new Array(array.length).fill(0)
+      : colorSteps[nextIndex - 1]);
   };
 
   // Show next sorting step
   const nextStep = () => {
+    clearTimeouts();
     if (currentStep >= arraySteps.length) return;
     setCurrentStep(currentStep + 1);
     setCurrentArray(arraySteps[currentStep]);
     setColorKey(colorSteps[currentStep]);
   };
 
-  // Handles effect when arraySize, delay, or algorithm changes
   useEffect(() => {
-    if (array.length === 0 || array.length !== arraySize) {
-      handleRandomArray();
-    } else {
-      resetArray();
+    clearTimeouts();
+    const steps = [];
+    const colors = [];
+    NameOfSortingAlgorithm[algorithm](array.slice(), 0, steps, colors);
+    setArraySteps(steps);
+    setColorSteps(colors);
+    setCurrentArray(array);
+    setColorKey(new Array(array.length).fill(0));
+    setCurrentStep(0);
+    return clearTimeouts;
+  }, [array, algorithm, runId, clearTimeouts]);
+
+  useEffect(() => {
+    if (runId > 0 && arraySteps.length > 0) {
+      executeStep(0);
     }
-  }, [array, arraySize, delay, algorithm, handleRandomArray, resetArray]);
-  useEffect(() => {
-    // Cleanup function to clear timeouts when the component unmounts
-    return () => {
-      clearTimeouts();
-    };
-  }, [clearTimeouts]);
+    return clearTimeouts;
+  }, [arraySteps, runId, executeStep, clearTimeouts]);
 
   return (
     <div className="app-child">

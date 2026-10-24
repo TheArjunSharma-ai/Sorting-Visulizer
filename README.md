@@ -17,7 +17,10 @@ controls.
   - Counting Sort
   - Radix Sort
   - Bucket Sort
-- Generate a new random array and adjust its size and animation delay.
+- Enter custom numbers, or leave the field blank to generate a random array.
+- Set the random array size, maximum random value, and animation delay.
+- Click **Apply algorithm** to start sorting with the chosen settings.
+- Open **How does it work?** for an explanation of the selected algorithm.
 - Step backward or forward, reset, or play the recorded sorting steps.
 - Run automated algorithm tests for correctness and visualization-step data.
 
@@ -55,9 +58,18 @@ The broader test coverage checklist is in
 
 ## Algorithms and input notes
 
-The current UI generates positive integer arrays. Counting Sort, Radix Sort,
-and Bucket Sort have specific input constraints; negative-integer behavior is
-not yet part of the supported UI workflow.
+Enter up to 500 whole numbers from 0 to 500, separated by commas or spaces,
+in **Custom numbers**. When supplied, these values take priority and disable
+the random-array controls. Bars display values read-only; edit your input in
+the custom-numbers field and click **Apply algorithm** again to restart.
+
+When custom input is blank, the app generates 1 to 500 random numbers, each
+between 1 and the configured maximum (inclusive, up to 500). The step delay
+accepts whole milliseconds from 0 to 10000 independently of the maximum value.
+Settings are applied only when you submit the form, so clearing and retyping
+a number does not interrupt playback. Invalid values display a validation
+message without replacing the current array. Negative and fractional numbers
+are not supported.
 
 ## Deployment
 
