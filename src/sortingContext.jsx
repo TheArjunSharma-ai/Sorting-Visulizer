@@ -21,8 +21,8 @@ export function SortingContextProvider({ children }) {
   const [algorithm, setAlgorithm] = useState(SortingType.SIMPLE.BUBBLESORT);
   const [delay, setDelay] = useState(500);
   const [arraySize, setArraySize] = useState(5);
-  const [minNumber, setMinNumber] = useState(1);
-  const [maxNumber, setMaxNumber] = useState(500);
+  const minNumber = 1;
+  const maxNumber = 500;
   const handleArraySize = (size) => {
     setArraySize(Math.max(minNumber, Math.min(maxNumber, Number(size))));
   };
@@ -74,30 +74,5 @@ export const SortingType = {
     BUCKETSORT: "Bucket Sort",
     SHELLSORT: "Shell Sort",
   },
-};
-
-// sortingAlgorithms could be used elsewhere, but it is currently unused. Remove it or use it as needed.
-const sortingAlgorithmsDef = {
-  "Bubble Sort":
-    "Iteratively swaps adjacent elements if they are in the wrong order.",
-  "Insertion Sort":
-    "Builds the sorted array one element at a time by inserting the current element into its correct position.",
-  "Selection Sort":
-    "Finds the minimum element in the unsorted portion of the array and swaps it with the first element.",
-
-  "Merge Sort":
-    "Divides the array into halves, sorts each half recursively, and merges the sorted halves.",
-  "Quick Sort":
-    "Picks a pivot element, partitions the array around the pivot, and recursively sorts the subarrays.",
-  "Heap Sort":
-    "Builds a max heap from the array and repeatedly extracts the maximum element and swaps it with the last element.",
-
-  "Radix Sort": "Sorts integers by their individual digits.",
-  "Counting Sort":
-    "Sorts integers in a range by counting the number of occurrences of each value.",
-  "Bucket Sort":
-    "Sorts elements by distributing them into buckets and sorting each bucket.",
-  "Shell Sort":
-    "A variation of insertion sort that compares elements that are a certain distance apart.",
 };
 

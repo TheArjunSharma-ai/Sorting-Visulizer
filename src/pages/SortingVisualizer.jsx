@@ -1,5 +1,5 @@
 import "./SortingVisualizer.css";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SortingController from "../components/SortingController";
 import Bar from "../components/Bar";
 import { useSortingValue } from "../sortingContext";
@@ -12,61 +12,58 @@ const SortingVisualizer = () => {
   const [arraySteps, setArraySteps] = useState([]);
   const [colorSteps, setColorSteps] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [timeouts, setTimeouts] = useState([]);
   const [currentArray, setCurrentArray] = useState([]);
   const [colorKey, setColorKey] = useState([]);
+  const timeouts = useRef([]);
 
   const { array, setArray, algorithm, delay, arraySize, minNumber, maxNumber } =
     useSortingValue();
 
   // Clear all timeouts
-  const clearTimeouts = () => {
-    timeouts.forEach(clearTimeout);
-    setTimeouts([]);
-  };
-
-  // Initialize color key and color steps
-  const initializeColorKey = () => {
-    const blankKey = new Array(arraySize).fill(0);
-    setColorKey(blankKey);
-    setColorSteps([blankKey]);
-  };
-
-  // Generate sorting steps based on the selected algorithm
-  const generateSortingSteps = (newArray) => {
-    const steps = [];
-    const colorSteps = [];
-    NameOfSortingAlgorithm[algorithm](newArray.slice(), 0, steps, colorSteps);
-    setArraySteps(steps);
-    setColorSteps(colorSteps);
-  };
+  const clearTimeouts = useCallback(() => {
+    timeouts.current.forEach(clearTimeout);
+    timeouts.current = [];
+  }, []);
 
   // Generate a new random array
-  const handleRandomArray = () => {
+  const handleRandomArray = useCallback(() => {
     clearTimeouts();
-    initializeColorKey();
     const newArray = generateRandomArray(arraySize, minNumber, maxNumber);
+    const blankKey = new Array(arraySize).fill(0);
+    const steps = [];
+    const nextColorSteps = [];
+    NameOfSortingAlgorithm[algorithm](
+      newArray.slice(),
+      0,
+      steps,
+      nextColorSteps
+    );
+
     setArray(newArray);
     setCurrentArray(newArray);
-    setArraySteps([newArray]);
+    setColorKey(blankKey);
+    setArraySteps(steps);
+    setColorSteps(nextColorSteps);
     setCurrentStep(0);
-    generateSortingSteps(newArray);
-  };
+  }, [
+    algorithm,
+    arraySize,
+    clearTimeouts,
+    maxNumber,
+    minNumber,
+    setArray,
+  ]);
 
   // Reset the array to the initial state
-  const resetArray = () => {
-    setCurrentArray(array);
-    setCurrentStep(0);
-  };
-
-  // Handles the sorting animation
-  const startSorting = () => {
+  const resetArray = useCallback(() => {
     clearTimeouts();
-    executeStep(currentStep);
-  };
+    setCurrentArray(array);
+    setColorKey(new Array(array.length).fill(0));
+    setCurrentStep(0);
+  }, [array, clearTimeouts]);
 
   // Executes a specific sorting step
-  const executeStep = (stepIndex) => {
+  const executeStep = useCallback((stepIndex) => {
     if (stepIndex >= arraySteps.length) return;
     setCurrentArray(arraySteps[stepIndex]);
     setColorKey(colorSteps[stepIndex]);
@@ -75,8 +72,14 @@ const SortingVisualizer = () => {
     const timeout = setTimeout(() => {
       executeStep(stepIndex + 1);
     }, delay);
-    setTimeouts((prev) => [...prev, timeout]);
-  };
+    timeouts.current.push(timeout);
+  }, [arraySteps, colorSteps, delay]);
+
+  // Handles the sorting animation
+  const startSorting = useCallback(() => {
+    clearTimeouts();
+    executeStep(currentStep);
+  }, [clearTimeouts, currentStep, executeStep]);
 
   // Show previous sorting step
   const previousStep = () => {
@@ -101,13 +104,13 @@ const SortingVisualizer = () => {
     } else {
       resetArray();
     }
-  }, [arraySize, delay, algorithm]);
+  }, [array, arraySize, delay, algorithm, handleRandomArray, resetArray]);
   useEffect(() => {
     // Cleanup function to clear timeouts when the component unmounts
     return () => {
       clearTimeouts();
     };
-  }, []);
+  }, [clearTimeouts]);
 
   return (
     <div className="app-child">
